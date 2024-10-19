@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "forge-std/Test.sol";
-import { VaultHubChainAccount } from "../../contracts/VaultHubChainAccount.sol";
+import { QuarkHubChainAccount } from "../../contracts/QuarkHubChainAccount.sol";
 import { QuarkFactory } from "../../contracts/QuarkFactory.sol";
 import { SecuritySource } from "../../contracts/SecuritySource.sol";
 import { MockERC20 } from "../../contracts/mocks/MockERC20.sol";
@@ -61,7 +61,7 @@ contract VaultTest is TestHelperOz5 {
 
     // function test_createVault() public {
     //     uint256 vaultId = factory.createVault();
-    //     //address account = factory.vaultHubChainAccounts(vaultId);
+    //     //address account = factory.quarkHubChainAccounts(vaultId);
 
     //     address owner = factory.ownerOf(vaultId);
 
@@ -70,7 +70,7 @@ contract VaultTest is TestHelperOz5 {
 
     // function test_sendEth() public {
     //     uint256 vaultId = factory.createVault();
-    //     address payable account = payable(factory.vaultHubChainAccounts(vaultId));
+    //     address payable account = payable(factory.quarkHubChainAccounts(vaultId));
 
     //     uint256 balanceBefore = account.balance;
     //     (bool success, ) = account.call{value: 0.0001 ether}("");
@@ -130,17 +130,17 @@ contract VaultTest is TestHelperOz5 {
     // function test_initialDeposit() public {
 
     //     uint256 vaultId = factory.createVault();
-    //     address account = factory.vaultHubChainAccounts(vaultId);
+    //     address account = factory.quarkHubChainAccounts(vaultId);
 
     //     currency.mint(address(this), 1000 ether);
     //     currency.approve(payable(account), 1000 ether);
 
-    //     VaultHubChainAccount(payable(account)).deposit(1000 ether);
+    //     QuarkHubChainAccount(payable(account)).deposit(1000 ether);
 
     //     uint256 price = 1;
 
     //     assertEq(currency.balanceOf(account), 1000 ether);
-    //     assertEq(VaultHubChainAccount(payable(account)).balanceOf(address(this)), 1000 ether / price);
+    //     assertEq(QuarkHubChainAccount(payable(account)).balanceOf(address(this)), 1000 ether / price);
     // }
 
 
@@ -173,23 +173,23 @@ contract VaultTest is TestHelperOz5 {
     //     factory.setSecuritySourceHubchain(address(securitySource));
 
     //     uint256 vaultId = factory.createVault();
-    //     address account = factory.vaultHubChainAccounts(vaultId);
+    //     address account = factory.quarkHubChainAccounts(vaultId);
 
     //     currency.mint(address(this), 1000 ether);
     //     currency.approve(payable(account), 1000 ether);
 
-    //     VaultHubChainAccount(payable(account)).deposit(1000 ether);
+    //     QuarkHubChainAccount(payable(account)).deposit(1000 ether);
 
     //     uint256 price = 1;
 
     //     assertEq(currency.balanceOf(account), 1000  ether);
-    //     assertEq(VaultHubChainAccount(payable(account)).balanceOf(address(this)), 1000 ether / price);
+    //     assertEq(QuarkHubChainAccount(payable(account)).balanceOf(address(this)), 1000 ether / price);
 
     //     //Send WBTC to the account
 
     //     token1.mint(account, 1 ether);
 
-    //     (uint256 amount, ) = VaultHubChainAccount(payable(account)).evaluateTotalValue();
+    //     (uint256 amount, ) = QuarkHubChainAccount(payable(account)).evaluateTotalValue();
 
     //     uint256 amountExpected;
 
@@ -205,7 +205,7 @@ contract VaultTest is TestHelperOz5 {
     function test_createSpokeChainAccount() public{
 
         uint256 vaultId = factory.createVault();
-        address account = factory.vaultHubChainAccounts(vaultId);
+        address account = factory.quarkHubChainAccounts(vaultId);
 
         bytes memory _optionsSend = OptionsBuilder.newOptions().addExecutorLzReceiveOption(GAS_LIMIT_SEND, MSG_VALUE_SEND);
         bytes memory _optionsReturn = OptionsBuilder.newOptions().addExecutorLzReceiveOption(GAS_LIMIT_RETURN, MSG_VALUE_RETURN);

@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 
-import { VaultHubChainAccount } from "./VaultHubChainAccount.sol";
+import { QuarkHubChainAccount } from "./QuarkHubChainAccount.sol";
 import { SecuritySource } from "./SecuritySource.sol";
 
 import { OApp, MessagingFee, Origin } from "@layerzerolabs/oapp-evm/contracts/oapp/OApp.sol";
@@ -22,7 +22,6 @@ interface IRegistryHubChain {
 
 //import { console } from "forge-std/Test.sol";
 
-// contract VaultHubChainFactory is Ownable, OApp, OAppOptionsType3, ERC721 {
 contract QuarkFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
 
     error InitializationFailed();
@@ -36,7 +35,7 @@ contract QuarkFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
     SecuritySource public securitySource;
     
     ERC20 public currencyToken;
-    mapping(uint256 => address) public vaultHubChainAccounts;
+    mapping(uint256 => address) public quarkHubChainAccounts;
 
     // not ERC6551
     IRegistryHubChain registry;
@@ -46,7 +45,7 @@ contract QuarkFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
 
     //omnichain mappings
     mapping(uint256 => address) public spokeChainsRegistries; // ChainId to RegistrySpokeChain
-    //mapping(uint256 => address) public spokeChainsImplementations; // ChainId to VaultSpokeChainAccount
+    //mapping(uint256 => address) public spokeChainsImplementations; // ChainId to QuarkSpokeChainAccount
 
     mapping(uint256 => uint32) public spokeChainsIds; // ChainId to Eid
 
@@ -77,11 +76,11 @@ contract QuarkFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
 
         address vaultAccount = registry.createHubChainAccount(_msgSender(), lzEndpoint);
 
-        VaultHubChainAccount(payable(vaultAccount)).initializeAccount(address(this), address(currencyToken), address(securitySource));
+        QuarkHubChainAccount(payable(vaultAccount)).initializeAccount(address(this), address(currencyToken), address(securitySource));
 
         _transfer(address(this), msg.sender, vaultId);
 
-        vaultHubChainAccounts[vaultId] = vaultAccount;
+        quarkHubChainAccounts[vaultId] = vaultAccount;
 
         emit VaultCreated(msg.sender, vaultId, vaultAccount);
 
@@ -110,7 +109,7 @@ contract QuarkFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
             bytes calldata _extraReturnOptions
         ) public payable {
         
-        //require(_msgSender() == vaultHubChainAccounts[vaultId], "Only vault account can call this function");
+        //require(_msgSender() == quarkHubChainAccounts[vaultId], "Only vault account can call this function");
 
         uint128 GAS_LIMIT = 5000000; // Gas limit for the executor
         uint128 MSG_VALUE = 10000000000000000; // msg.value for the lzReceive() function on destination in wei
@@ -183,7 +182,7 @@ contract QuarkFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
 
         (address hubChainAccount, address newSpokeChainAccount) = decodeMessage(payload);
 
-        VaultHubChainAccount(payable(hubChainAccount)).registerNewSpokeChain(_origin.srcEid, newSpokeChainAccount);
+        QuarkHubChainAccount(payable(hubChainAccount)).registerNewSpokeChain(_origin.srcEid, newSpokeChainAccount);
 
     }
 
