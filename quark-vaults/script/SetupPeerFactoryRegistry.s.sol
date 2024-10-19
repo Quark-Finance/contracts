@@ -4,7 +4,7 @@ pragma solidity ^0.8.13;
 import {Script, console} from "forge-std/Script.sol";
 
 
-import { VaultHubChainFactory } from "../contracts/VaultHubChainFactory.sol";
+import { QuarkFactory } from "../contracts/QuarkFactory.sol";
 
 
 
@@ -12,7 +12,7 @@ contract  SetupConfigHubChainFactoryRegistrySepoliaToLineaSepolia is Script {
     
 
 
-    VaultHubChainFactory public factoryHubChain;
+    QuarkFactory public factoryHubChain;
 
 
 
@@ -31,7 +31,7 @@ contract  SetupConfigHubChainFactoryRegistrySepoliaToLineaSepolia is Script {
         uint256 spokeChainId = 84532;
 
 
-        factoryHubChain = VaultHubChainFactory(factoryHubChainAddress);
+        factoryHubChain = QuarkFactory(factoryHubChainAddress);
 
         factoryHubChain.setSpokeChainConfig(spokeChainId, spokeChainRegistryAddresss, spokeChainEid);
         

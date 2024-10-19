@@ -4,7 +4,7 @@ pragma solidity ^0.8.13;
 import {Script, console} from "forge-std/Script.sol";
 
 
-import { VaultHubChainFactory } from "../contracts/VaultHubChainFactory.sol";
+import { QuarkFactory } from "../contracts/QuarkFactory.sol";
 import { VaultHubChainAccount } from "../contracts/VaultHubChainAccount.sol";
 
 import { OptionsBuilder } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OptionsBuilder.sol";
@@ -23,7 +23,7 @@ contract  CreateVaultAndSetSpokeChain is Script {
     uint128 MSG_VALUE_RETURN = 0;
 
 
-    VaultHubChainFactory public factoryHubChain;
+    QuarkFactory public factoryHubChain;
 
     function setUp() public {}
 
@@ -35,7 +35,7 @@ contract  CreateVaultAndSetSpokeChain is Script {
         address factoryHubChainAddress =0xA6a8D2E88ce6aCD7b14E99f8738902a5e948Af43;
 
 
-        factoryHubChain = VaultHubChainFactory(factoryHubChainAddress);
+        factoryHubChain = QuarkFactory(factoryHubChainAddress);
 
         //uint256 vaultId = factoryHubChain.createVault();
 
