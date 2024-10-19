@@ -5,7 +5,7 @@ import {Script, console} from "forge-std/Script.sol";
 
 
 import { QuarkFactory } from "../contracts/QuarkFactory.sol";
-import { VaultHubChainAccount } from "../contracts/VaultHubChainAccount.sol";
+import { QuarkHubChainAccount } from "../contracts/QuarkHubChainAccount.sol";
 
 import { OptionsBuilder } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OptionsBuilder.sol";
 
@@ -41,7 +41,7 @@ contract  CreateVaultAndSetSpokeChain is Script {
 
         //uint256 vaultId = 0;
 
-        //VaultHubChainAccount vault = VaultHubChainAccount(payable(factoryHubChain.vaultHubChainAccounts(vaultId)));
+        //QuarkHubChainAccount vault = QuarkHubChainAccount(payable(factoryHubChain.quarkHubChainAccounts(vaultId)));
 
 
         uint256 spokeChainId = 84532;

@@ -56,7 +56,7 @@ contract QuarkFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
     event SpokeChainRegistered(uint256 indexed vaultId, uint256 chainId, uint64 nonce);
 
     //TODO OApp initializer
-    constructor(address _initialOwner,  address _registry, address _currency, address _endpoint)  OApp(_endpoint, _initialOwner) ERC721("VaultHubChain", "VHC") Ownable(_initialOwner)  {
+    constructor(address _initialOwner,  address _registry, address _currency, address _endpoint)  OApp(_endpoint, _initialOwner) ERC721("Quark Finance", "QFi") Ownable(_initialOwner)  {
         currencyToken = ERC20(_currency);
         lzEndpoint = _endpoint;
         registry = IRegistryHubChain(_registry);
