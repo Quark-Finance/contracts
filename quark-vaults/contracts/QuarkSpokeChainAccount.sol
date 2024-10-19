@@ -25,20 +25,19 @@ import { OptionsBuilder } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/Opti
 contract QuarkSpokeChainAccount is Ownable, OApp, OAppOptionsType3 {
     receive() external payable {}
 
+    using OptionsBuilder for bytes;
+
     uint256 public state;
     QuarkFactory public factory;
     ERC20 public currencyToken;
     bool public isInitialized;
 
-    uint256 public valueSpokeChainAccountUSD;
-    uint256 public valueSpokeChainAccountVolatility;
 
-    uint256 public totalValueInUSD;
-    uint256 public totalValueInVolatility;
-
-    uint256 public maxVolatility;
+    uint32 public hubChainEid;
 
 
+    uint128 public GAS_LIMIT_SEND_ABA = 1000000;
+    uint128 public MSG_VALUE_SEND_ABA = 0;
 
 
     //modifiers
@@ -57,6 +56,7 @@ contract QuarkSpokeChainAccount is Ownable, OApp, OAppOptionsType3 {
     event Deposit(address indexed depositor, uint256 amountInTokenCurrency, uint256 amountInQuota);
     event SpokeChainRegistered(address indexed spokeChainAccount, uint256 indexed spokeChainId);
     event PeerSetHubChain(address indexed hubChainAccount);
+    event UpdatedValueToHubChain(uint256 newValue);
 
     constructor(address _initialOwner, address _endpoint)  Ownable(_initialOwner) OApp(_endpoint, _initialOwner){
 
@@ -65,6 +65,7 @@ contract QuarkSpokeChainAccount is Ownable, OApp, OAppOptionsType3 {
 
     function setHubChainPeer(address _hubChainAccount, uint32 _hubChainEid) external onlyNotInitialized {
         isInitialized = true;
+        hubChainEid = _hubChainEid;
         setPeer(_hubChainEid, bytes32(uint256(uint160(_hubChainAccount))));
     }
 
@@ -77,6 +78,31 @@ contract QuarkSpokeChainAccount is Ownable, OApp, OAppOptionsType3 {
     ) internal override {
         // Get message from Vault HubChain
     }
+
+    function updateValueToHubChain() public payable {
+
+        bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(GAS_LIMIT_SEND_ABA, MSG_VALUE_SEND_ABA);
+
+        _lzSend(
+            hubChainEid,
+            abi.encode(uint256(1000)),
+            options,
+            MessagingFee(msg.value, 0),
+            payable(msg.sender)
+        );
+
+        emit UpdatedValueToHubChain(1000);
+
+
+    }
+
+
+
+
+
+
+
+
 
     
     // STANDARD ERC6551 FUNCTIONS

@@ -13,6 +13,8 @@ import { RegistryHubChain } from "../../contracts/RegistryHubChain.sol";
 
 import { OptionsBuilder } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OptionsBuilder.sol";
 
+import { QuarkSpokeChainAccount } from "../../contracts/QuarkSpokeChainAccount.sol";
+
 contract VaultTest is TestHelperOz5 {
 
     using OptionsBuilder for bytes;
@@ -121,11 +123,15 @@ contract VaultTest is TestHelperOz5 {
 
         vault.requestNewSpokeChain{ value: 13000000005010484 }(vaultId, spokeChainId);
 
-        //factory.createSpokeChainAccount{ value: 13000000005010484 }(vaultId, spokeChainId);
-
         verifyPackets(bEid, addressToBytes32(address(registrySpoke)));
 
         verifyPackets(aEid, addressToBytes32(address(factory)));
+
+        address spokeChainAccount = vault.spokeChainsAccounts(bEid);
+
+        QuarkSpokeChainAccount(payable(spokeChainAccount)).updateValueToHubChain{ value: 2000000 }();
+
+        verifyPackets(aEid, address(factory.quarkHubChainAccounts(vaultId)));
 
     }
 }

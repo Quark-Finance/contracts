@@ -52,7 +52,6 @@ contract RegistrySpokeChain is  OApp, OAppOptionsType3 {
         return _nativeFee;
     }
 
-    
 
     function _lzReceive(
         Origin calldata _origin,
@@ -62,8 +61,6 @@ contract RegistrySpokeChain is  OApp, OAppOptionsType3 {
         bytes calldata /*_extraData*/
     ) internal override {
         (address hubChainAccount, uint256 vaultId) = decodeMessage(payload);
-
-        console.log("vault Id A sends: ", vaultId);
         
         address newSpokeChainAccount = address(new QuarkSpokeChainAccount(address(this), lzEndpoint));
 

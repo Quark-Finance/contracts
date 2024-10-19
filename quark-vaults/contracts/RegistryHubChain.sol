@@ -25,8 +25,4 @@ contract RegistryHubChain is Ownable {
 
     }
 
-   
-
-
-    
 }

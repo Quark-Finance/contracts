@@ -22,7 +22,7 @@ import { OptionsBuilder } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/Opti
 
 
 
-//import { console } from "forge-std/Test.sol";
+import { console } from "forge-std/Test.sol";
 
 contract QuarkHubChainAccount is  Ownable, OApp, OAppOptionsType3, ERC20 {
     receive() external payable {}
@@ -32,17 +32,21 @@ contract QuarkHubChainAccount is  Ownable, OApp, OAppOptionsType3, ERC20 {
     ERC20 public currencyToken;
     bool public isInitialized;
 
-    uint256 public valueHubChainAccountUSD;
-    uint256 public valueHubChainAccountVolatility;
+    uint256 public hubChainvalueLocked;
+    uint256 public totalValueLocked;
 
-    uint256 public totalValueInUSD;
-    uint256 public totalValueInVolatility;
 
-    uint256 public maxVolatility;
 
     mapping(uint256 => address) public spokeChainsImplementationsAccounts; // ChainId to SpokeChainAccount
 
     mapping(uint32 => address) public spokeChainsAccounts;
+
+    mapping(uint32 => uint256) public spokeChainsValueLocked;
+
+
+
+
+
 
     
 
@@ -62,6 +66,7 @@ contract QuarkHubChainAccount is  Ownable, OApp, OAppOptionsType3, ERC20 {
     event Initialized(address indexed factory, address indexed currency);
     event Deposit(address indexed depositor, uint256 amountInTokenCurrency, uint256 amountInQuota);
     event SpokeChainRegistered(uint256 indexed spokeChainId);
+    event SpokeChainValueUpdated(uint32 indexed spokeChainEid, uint256 amount);
 
     constructor(address _initialOwner, address _endpoint)  ERC20("HubChain", "HubChain") Ownable(_initialOwner) OApp(_endpoint, _initialOwner){
 
@@ -120,14 +125,42 @@ contract QuarkHubChainAccount is  Ownable, OApp, OAppOptionsType3, ERC20 {
     }
 
     function _lzReceive(
-        Origin calldata /*_origin*/,
+        Origin calldata _origin,
         bytes32 /*_guid*/,
         bytes calldata payload,
         address /*_executor*/,
         bytes calldata /*_extraData*/
     ) internal override {
+
+        uint256 amount = decodeMessage(payload);
+
+        console.log("Received amount: ", amount);
+        spokeChainsValueLocked[_origin.srcEid] = amount;
+
+
+        emit SpokeChainValueUpdated(_origin.srcEid, amount);
         
     }
+
+    function decodeMessage(bytes calldata encodedMessage) public pure returns (uint256 amount) {
+        (amount) = abi.decode(encodedMessage, (uint256));
+        
+        return (amount);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     // STANDARD ERC6551 FUNCTIONS
@@ -166,37 +199,6 @@ contract QuarkHubChainAccount is  Ownable, OApp, OAppOptionsType3, ERC20 {
 
         return "";
     }
-
-    // function supportsInterface(bytes4 interfaceId) external pure returns (bool) {
-    //     return (interfaceId == type(IERC165).interfaceId ||
-    //         interfaceId == type(IERC6551Account).interfaceId ||
-    //         interfaceId == type(IERC6551Executable).interfaceId);
-    // }
-
-    // function token()
-    //     public
-    //     view
-    //     returns (
-    //         uint256,
-    //         address,
-    //         uint256
-    //     )
-    // {
-    //     bytes memory footer = new bytes(0x60);
-
-    //     assembly {
-    //         extcodecopy(address(), add(footer, 0x20), 0x4d, 0x60)
-    //     }
-
-    //     return abi.decode(footer, (uint256, address, uint256));
-    // }
-
-    // function owner() public view override returns (address) {
-    //     (uint256 chainId, address tokenContract, uint256 tokenId) = token();
-    //     if (chainId != block.chainid) return address(0);
-
-    //     return IERC721(tokenContract).ownerOf(tokenId);
-    // }
 
     function _isValidSigner(address signer) internal view returns (bool) {
         return signer == owner();
