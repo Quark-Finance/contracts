@@ -32,37 +32,23 @@ contract  CreateVaultAndSetSpokeChain is Script {
         //uint256 privateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast();
 
-        address factoryHubChainAddress =0xA6a8D2E88ce6aCD7b14E99f8738902a5e948Af43;
-
+        address factoryHubChainAddress =  0xc9A98C1697B7F46d2074bf8aFEE41F516cAbDCd0;
 
         factoryHubChain = QuarkFactory(factoryHubChainAddress);
 
-        //uint256 vaultId = factoryHubChain.createVault();
+        uint256 vaultId = factoryHubChain.createVault();
 
         //uint256 vaultId = 0;
 
-        //QuarkHubChainAccount vault = QuarkHubChainAccount(payable(factoryHubChain.quarkHubChainAccounts(vaultId)));
+        QuarkHubChainAccount vault = QuarkHubChainAccount(payable(factoryHubChain.quarkHubChainAccounts(vaultId)));
 
 
-        uint256 spokeChainId = 84532;
+        uint256 spokeChainId = 	11155420;
 
-        // bytes memory _optionsSend = OptionsBuilder.newOptions().addExecutorLzReceiveOption(GAS_LIMIT_SEND, MSG_VALUE_SEND);
-        // bytes memory _optionsReturn = OptionsBuilder.newOptions().addExecutorLzReceiveOption(GAS_LIMIT_RETURN, MSG_VALUE_RETURN);
-
-        bytes memory _extraSendOptions = OptionsBuilder.newOptions().addExecutorLzReceiveOption(1000000, uint128(10000000000000000)); // gas settings for A -> B
-
-        bytes memory _extraReturnOptions = OptionsBuilder.newOptions().addExecutorLzReceiveOption(1000000, uint128(10000000000000000)); // gas settings for B -> A
+        //factoryHubChain.createSpokeChainAccount{ value: 100000000000000000 }(vaultId, spokeChainId);
 
 
-
-
-        // bytes memory a = hex"000301002101000000000000000000000000004c4b400000000000000000002386f26fc10000";
-        // bytes memory b = hex"000301001101000000000000000000000000002dc6c0";
-
-        factoryHubChain.createSpokeChainAccount{ value: 500000000000000000 }(0, spokeChainId, _extraSendOptions, _extraReturnOptions);
-
-
-        //vault.requestNewSpokeChain{ value: 500000000000000000 }(vaultId, spokeChainId, _extraSendOptions, _extraReturnOptions);
+        vault.requestNewSpokeChain{ value: 100000000000000000 }(vaultId, spokeChainId);
         vm.stopBroadcast();
         
     }

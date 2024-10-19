@@ -21,9 +21,12 @@ contract VaultTest is TestHelperOz5 {
     QuarkFactory public factory;
     MockERC20 public currency;
     RegistryHubChain public registry;
+    RegistrySpokeChain registrySpoke;
 
     uint32 private aEid = 1;
     uint32 private bEid = 2;
+
+    uint256 public spokeChainId = 20;
 
 
     address private userA = address(0x1);
@@ -51,7 +54,19 @@ contract VaultTest is TestHelperOz5 {
 
 
         console.log("Owner address: ", address(this));
-        factory = new QuarkFactory(address(this), address(registry), address(currency), endpoints[aEid]);
+        //factory = new QuarkFactory(address(this), address(registry), address(currency), endpoints[aEid]);
+
+        factory = QuarkFactory(
+            _deployOApp(type(QuarkFactory).creationCode, abi.encode(address(this), address(registry), address(currency), endpoints[aEid]))
+        );
+
+        registrySpoke = RegistrySpokeChain(
+            _deployOApp(type(RegistrySpokeChain).creationCode, abi.encode(address(this), endpoints[bEid]))
+        );
+
+        registrySpoke.setHubChainFactoryPeer(aEid, address(factory));
+
+        factory.setSpokeChainConfig(spokeChainId, address(registrySpoke), bEid);
         
     }
 
@@ -169,18 +184,18 @@ contract VaultTest is TestHelperOz5 {
         token1.mint(account, 1 ether);
     }
 
-    function test_createSpokeChainAccount() public{
-
+    function test_create_spoke_chain() public {
         uint256 vaultId = factory.createVault();
-        address account = factory.quarkHubChainAccounts(vaultId);
 
-        bytes memory _optionsSend = OptionsBuilder.newOptions().addExecutorLzReceiveOption(GAS_LIMIT_SEND, MSG_VALUE_SEND);
-        bytes memory _optionsReturn = OptionsBuilder.newOptions().addExecutorLzReceiveOption(GAS_LIMIT_RETURN, MSG_VALUE_RETURN);
-        
+        QuarkHubChainAccount vault = QuarkHubChainAccount(payable(factory.quarkHubChainAccounts(vaultId)));
 
-        factory.createSpokeChainAccount{value: 13000000005010644}(vaultId, 1, _optionsSend, _optionsReturn);
+        vault.requestNewSpokeChain{ value: 13000000005010484 }(vaultId, spokeChainId);
 
+        //factory.createSpokeChainAccount{ value: 13000000005010484 }(vaultId, spokeChainId);
 
-        
+        verifyPackets(bEid, addressToBytes32(address(registrySpoke)));
+
+        verifyPackets(aEid, addressToBytes32(address(factory)));
+
     }
 }

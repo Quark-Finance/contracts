@@ -34,6 +34,10 @@ contract QuarkFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
     ERC20 public currencyToken;
     mapping(uint256 => address) public quarkHubChainAccounts;
 
+
+    uint128 public GAS_LIMIT_SEND_ABA = 5000000;
+    uint128 public MSG_VALUE_SEND_ABA = 10000000000000000;
+
     // not ERC6551
     IRegistryHubChain registry;
 
@@ -47,9 +51,11 @@ contract QuarkFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
     mapping(uint256 => uint32) public spokeChainsIds; // ChainId to Eid
 
 
+
     //events
     event VaultCreated(address indexed owner, uint256 indexed vaultId, address indexed vaultAccount);
     event SpokeChainRegistered(uint256 indexed vaultId, uint256 chainId, uint64 nonce);
+    event SpokeChainReceived(address indexed _spoke);
 
     //TODO OApp initializer
     constructor(address _initialOwner,  address _registry, address _currency, address _endpoint)  OApp(_endpoint, _initialOwner) ERC721("Quark Finance", "QFi") Ownable(_initialOwner)  {
@@ -79,6 +85,11 @@ contract QuarkFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
 
     }
 
+    function setConfigParameterSendABA(uint128 _newGasLimit, uint128 _newMsgValue) public onlyOwner {
+        GAS_LIMIT_SEND_ABA = _newGasLimit;
+        MSG_VALUE_SEND_ABA = _newMsgValue;
+    }
+
 
     function setSpokeChainConfig(uint256 chainId, address spokeChainRegistry, uint32 spokeChainEid) public onlyOwner {
         spokeChainsRegistries[chainId] = spokeChainRegistry;
@@ -95,36 +106,26 @@ contract QuarkFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
 
     function createSpokeChainAccount(
             uint256 vaultId, 
-            uint256 chainId, 
-            bytes calldata _extraSendOptions, // gas settings for A -> B
-            bytes calldata _extraReturnOptions
+            uint256 chainId
         ) public payable {
         
-        //require(_msgSender() == quarkHubChainAccounts[vaultId], "Only vault account can call this function");
-
-        uint128 GAS_LIMIT = 5000000; // Gas limit for the executor
-        uint128 MSG_VALUE = 10000000000000000; // msg.value for the lzReceive() function on destination in wei
-
-        
+        require(_msgSender() == quarkHubChainAccounts[vaultId], "Only vault account can call this function");
 
         uint32 dstEid = spokeChainsIds[chainId];
 
-
         //bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(GAS_LIMIT, MSG_VALUE);
 
-
- 
+        bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(GAS_LIMIT_SEND_ABA, MSG_VALUE_SEND_ABA);
 
         //MessagingFee memory fee = _quote(dstEid, message, options, false);
 
         MessagingReceipt memory receipt = _lzSend(
             dstEid,
-            encodeMessage(_msgSender(),_extraReturnOptions),
-            combineOptions(dstEid, SEND_ABA, _extraSendOptions),
+            encodeMessage(msg.sender, vaultId),
+            options,
             MessagingFee(msg.value, 0),
             payable(ownerOf(vaultId))
         );
-
 
         emit SpokeChainRegistered(vaultId, chainId,receipt.nonce);
     }
@@ -144,35 +145,40 @@ contract QuarkFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
 
     function encodeMessage(
         address hubChainAccount,
-        bytes memory _extraReturnOptions
+        uint256 vaultId
         ) public pure returns (bytes memory) {
 
-        uint256 extraOptionsLength = _extraReturnOptions.length;
 
-        return abi.encode(hubChainAccount, extraOptionsLength, _extraReturnOptions, extraOptionsLength);
+        return abi.encode(hubChainAccount, vaultId);
     }
 
-    function decodeMessage(bytes calldata encodedMessage) public pure returns (address hubChainAccount, address spokeChainAccount) {
+    function decodeMessage(bytes calldata encodedMessage) public pure returns (address spokeChainAccount, uint256 vaultId) {
 
-        (hubChainAccount, spokeChainAccount) = abi.decode(encodedMessage, (address, address));
+        (spokeChainAccount, vaultId) = abi.decode(encodedMessage, (address, uint256));
         
-        return (hubChainAccount, spokeChainAccount);
+        return (spokeChainAccount, vaultId);
+
     }
 
 
     function _lzReceive(
         Origin calldata _origin,
-        bytes32 /*_guid*/,
+        bytes32 _guid,
         bytes calldata payload,
         address /*_executor*/,
         bytes calldata /*_extraData*/
     ) internal override {
 
-        (address hubChainAccount, address newSpokeChainAccount) = decodeMessage(payload);
+        (address newSpokeChainAccount, uint256 vaultId) = decodeMessage(payload);
 
-        QuarkHubChainAccount(payable(hubChainAccount)).registerNewSpokeChain(_origin.srcEid, newSpokeChainAccount);
+        emit SpokeChainReceived(newSpokeChainAccount);
+
+        QuarkHubChainAccount(payable(quarkHubChainAccounts[vaultId])).registerNewSpokeChain(_origin.srcEid, newSpokeChainAccount);
 
     }
+
+    // 0x24af70d91a3ee419f51a2d4f11f114a1e0da3511966904b1c7871ff00eee176f
+    // 0xd7bea8b9dc52dd989ae4404ec4d859b05b77d1035edb2d8c9462b466e04b868a
 
     
      

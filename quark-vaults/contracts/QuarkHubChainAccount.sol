@@ -80,13 +80,15 @@ contract QuarkHubChainAccount is  Ownable, OApp, OAppOptionsType3, ERC20 {
         emit Initialized(_factory, _currency);
     }
 
+    function setPeer(uint32 _eid, bytes32 _peer) public virtual override onlyFactory {
+        _setPeer(_eid, _peer);
+    }
 
-
-    function requestNewSpokeChain(uint256 vaultId, uint256 chainId, bytes calldata _extraSendOptions, bytes calldata _extraReturnOptions) public payable {
-        //require(_isValidSigner(msg.sender), "Invalid signer");
+    function requestNewSpokeChain(uint256 vaultId, uint256 chainId) public payable {
+        require(_isValidSigner(msg.sender), "Invalid signer");
         //require(spokeChainsImplementationsAccounts[chainId] == address(0), "Spoke chain already registered");
 
-        factory.createSpokeChainAccount{ value: msg.value  }(vaultId, chainId, _extraSendOptions, _extraReturnOptions);
+        factory.createSpokeChainAccount{ value: msg.value  }(vaultId, chainId);
     }
 
     function registerNewSpokeChain(uint32 _eid, address spokeChainAddress) external onlyFactory {

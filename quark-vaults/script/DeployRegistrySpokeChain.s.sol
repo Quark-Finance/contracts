@@ -19,7 +19,7 @@ contract DeployRegistrySpokeChainLineaSepolia is Script {
         address owner = 0x000ef5F21dC574226A06C76AAE7060642A30eB74;
         address endpointSpokeChain = 0x6EDCE65403992e310A62460808c4b910D972f10f;
 
-        address hubChainFactory = 0xA6a8D2E88ce6aCD7b14E99f8738902a5e948Af43;
+        address hubChainFactory = 0xc9A98C1697B7F46d2074bf8aFEE41F516cAbDCd0;
         uint32 hubChainEid = 40231;
 
         registrySpokeChain = new RegistrySpokeChain(owner, endpointSpokeChain);
