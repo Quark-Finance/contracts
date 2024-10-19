@@ -163,7 +163,7 @@ contract QuarkFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
 
     function _lzReceive(
         Origin calldata _origin,
-        bytes32 _guid,
+        bytes32 /*_guid*/,
         bytes calldata payload,
         address /*_executor*/,
         bytes calldata /*_extraData*/
