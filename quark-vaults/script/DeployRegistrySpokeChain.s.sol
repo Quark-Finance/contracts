@@ -4,15 +4,11 @@ pragma solidity ^0.8.13;
 import {Script, console} from "forge-std/Script.sol";
 
 import { RegistrySpokeChain } from "../contracts/RegistrySpokeChain.sol";
-import { VaultSpokeChainAccount } from "../contracts/VaultSpokeChainAccount.sol";
 
 
 contract DeployRegistrySpokeChainLineaSepolia is Script {
 
     RegistrySpokeChain public registrySpokeChain;
-    VaultSpokeChainAccount public implementationSpokeChain;
-    
-    
 
 
     function setUp() public {}

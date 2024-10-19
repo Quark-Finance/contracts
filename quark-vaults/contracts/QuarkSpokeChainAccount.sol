@@ -6,8 +6,6 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
-import "./interfaces/IERC6551Account.sol";
-import "./interfaces/IERC6551Executable.sol";
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -16,7 +14,6 @@ import {AggregatorV3Interface} from "@layerzerolabs/toolbox-foundry/lib/foundry-
 
 
 import { QuarkFactory } from "./QuarkFactory.sol";
-import { SecuritySource } from "./SecuritySource.sol";
 
 import { OApp, MessagingFee, Origin } from "@layerzerolabs/oapp-evm/contracts/oapp/OApp.sol";
 import { MessagingReceipt } from "@layerzerolabs/oapp-evm/contracts/oapp/OAppSender.sol";
@@ -30,7 +27,6 @@ contract QuarkSpokeChainAccount is Ownable, OApp, OAppOptionsType3 {
 
     uint256 public state;
     QuarkFactory public factory;
-    SecuritySource public securitySource;
     ERC20 public currencyToken;
     bool public isInitialized;
 
@@ -82,50 +78,6 @@ contract QuarkSpokeChainAccount is Ownable, OApp, OAppOptionsType3 {
         // Get message from Vault HubChain
     }
 
-
-    function evaluateSpokeChainTokens() public returns(uint256, uint256) {
-
-        valueSpokeChainAccountUSD = 0;
-        valueSpokeChainAccountVolatility = 0;
-        uint256 numberWhiteListedTokens = securitySource.numberWhitelistedERC20Tokens();
-
-        for(uint256 i = 0; i < numberWhiteListedTokens; i++) {
-            ERC20 erc20Token = ERC20(securitySource.whitelistedERC20Tokens(i));
-            AggregatorV3Interface priceFeed = AggregatorV3Interface(securitySource.priceFeedsWhitelistedERC20Tokens(i));
-            AggregatorV3Interface volFeed = AggregatorV3Interface(securitySource.volatilityFeedsWhitelistedERC20Tokens(i));
-
-            uint256 balance = erc20Token.balanceOf(address(this));
-
-            int256 price;
-            int256 vol;
-
-            (, price, , , ) = priceFeed.latestRoundData();
-            (, vol, , , ) = volFeed.latestRoundData();
-
-            valueSpokeChainAccountUSD += balance * uint256(price) / 10 ** erc20Token.decimals();
-            valueSpokeChainAccountVolatility += balance * uint256(vol) / 10 ** erc20Token.decimals();
-        }
-
-        return (valueSpokeChainAccountUSD, valueSpokeChainAccountVolatility);
-    }
-
-
-    function getTotalVaultVolatility() public view returns(uint256) {
-        return totalValueInVolatility/totalValueInUSD;
-    }
-
-    function getTotalValueInUSD() external view returns(uint256) {
-        return totalValueInUSD;
-    }
-
-    function getTotalValueInVolatility() external view returns(uint256) {
-        return totalValueInVolatility;
-    }
-
-    function getMaxVolatility() external view returns(uint256) {
-        return maxVolatility;
-    }
-
     
     // STANDARD ERC6551 FUNCTIONS
     function execute(
@@ -148,14 +100,6 @@ contract QuarkSpokeChainAccount is Ownable, OApp, OAppOptionsType3 {
                 revert(add(result, 32), mload(result))
             }
         }
-    }
-
-    function isValidSigner(address signer, bytes calldata) external view returns (bytes4) {
-        if (_isValidSigner(signer)) {
-            return IERC6551Account.isValidSigner.selector;
-        }
-
-        return bytes4(0);
     }
 
     function isValidSignature(bytes32 hash, bytes memory signature)

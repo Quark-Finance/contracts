@@ -9,7 +9,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 
 import { QuarkHubChainAccount } from "./QuarkHubChainAccount.sol";
-import { SecuritySource } from "./SecuritySource.sol";
 
 import { OApp, MessagingFee, Origin } from "@layerzerolabs/oapp-evm/contracts/oapp/OApp.sol";
 import { MessagingReceipt } from "@layerzerolabs/oapp-evm/contracts/oapp/OAppSender.sol";
@@ -31,8 +30,6 @@ contract QuarkFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
     address lzEndpoint;
 
     uint256 public vaultCounter;
-
-    SecuritySource public securitySource;
     
     ERC20 public currencyToken;
     mapping(uint256 => address) public quarkHubChainAccounts;
@@ -52,7 +49,6 @@ contract QuarkFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
 
     //events
     event VaultCreated(address indexed owner, uint256 indexed vaultId, address indexed vaultAccount);
-    event SecuritySourceSet(address indexed securitySource);
     event SpokeChainRegistered(uint256 indexed vaultId, uint256 chainId, uint64 nonce);
 
     //TODO OApp initializer
@@ -60,11 +56,6 @@ contract QuarkFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
         currencyToken = ERC20(_currency);
         lzEndpoint = _endpoint;
         registry = IRegistryHubChain(_registry);
-    }
-
-    function setSecuritySourceHubchain(address _securitySource) public onlyOwner {
-        securitySource = SecuritySource(_securitySource);
-        emit SecuritySourceSet(_securitySource);
     }
 
     function createVault() public returns (uint256){
@@ -76,7 +67,7 @@ contract QuarkFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
 
         address vaultAccount = registry.createHubChainAccount(_msgSender(), lzEndpoint);
 
-        QuarkHubChainAccount(payable(vaultAccount)).initializeAccount(address(this), address(currencyToken), address(securitySource));
+        QuarkHubChainAccount(payable(vaultAccount)).initializeAccount(address(this), address(currencyToken));
 
         _transfer(address(this), msg.sender, vaultId);
 
@@ -118,21 +109,18 @@ contract QuarkFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
 
         uint32 dstEid = spokeChainsIds[chainId];
 
-        bytes memory message = encodeMessage(_msgSender(),_extraReturnOptions);
-
 
         //bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(GAS_LIMIT, MSG_VALUE);
 
 
  
-        bytes memory options = combineOptions(dstEid, SEND_ABA, _extraSendOptions);
 
         //MessagingFee memory fee = _quote(dstEid, message, options, false);
 
         MessagingReceipt memory receipt = _lzSend(
             dstEid,
-            message,
-            options,
+            encodeMessage(_msgSender(),_extraReturnOptions),
+            combineOptions(dstEid, SEND_ABA, _extraSendOptions),
             MessagingFee(msg.value, 0),
             payable(ownerOf(vaultId))
         );

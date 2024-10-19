@@ -6,8 +6,6 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
-import "./interfaces/IERC6551Account.sol";
-import "./interfaces/IERC6551Executable.sol";
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -16,7 +14,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import {AggregatorV3Interface} from "@layerzerolabs/toolbox-foundry/lib/foundry-chainlink-toolkit/lib/chainlink-brownie-contracts/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol"; // Hardhat
 
 import { QuarkFactory } from "./QuarkFactory.sol";
-import { SecuritySource } from "./SecuritySource.sol";
 
 import { OApp, MessagingFee, Origin } from "@layerzerolabs/oapp-evm/contracts/oapp/OApp.sol";
 import { MessagingReceipt } from "@layerzerolabs/oapp-evm/contracts/oapp/OAppSender.sol";
@@ -27,12 +24,11 @@ import { OptionsBuilder } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/Opti
 
 //import { console } from "forge-std/Test.sol";
 
-contract VaultHubChainAccount is  Ownable, OApp, OAppOptionsType3, ERC20 {
+contract QuarkHubChainAccount is  Ownable, OApp, OAppOptionsType3, ERC20 {
     receive() external payable {}
 
     uint256 public state;
     QuarkFactory public factory;
-    SecuritySource public securitySource;
     ERC20 public currencyToken;
     bool public isInitialized;
 
@@ -73,17 +69,17 @@ contract VaultHubChainAccount is  Ownable, OApp, OAppOptionsType3, ERC20 {
     }
 
     //CUSTOM FUNCTIONS
-    function initializeAccount(address _factory, address _currency, address _securitySource) public onlyNotInitialized {
+    function initializeAccount(address _factory, address _currency) public onlyNotInitialized {
         //require(_isValidSigner(msg.sender), "Invalid signer");
         
         
         currencyToken = ERC20(_currency);
         factory = QuarkFactory(_factory);
-        securitySource = SecuritySource(_securitySource);
 
         isInitialized = true;
         emit Initialized(_factory, _currency);
     }
+
 
 
     function requestNewSpokeChain(uint256 vaultId, uint256 chainId, bytes calldata _extraSendOptions, bytes calldata _extraReturnOptions) public payable {
@@ -103,70 +99,9 @@ contract VaultHubChainAccount is  Ownable, OApp, OAppOptionsType3, ERC20 {
         emit SpokeChainRegistered(_eid);
     }
 
-    function evaluateHubChainTokens() public returns(uint256, uint256) {
-
-        valueHubChainAccountUSD = 0;
-        valueHubChainAccountVolatility = 0;
-        uint256 numberWhiteListedTokens = securitySource.numberWhitelistedERC20Tokens();
-
-        for(uint256 i = 0; i < numberWhiteListedTokens; i++) {
-            ERC20 erc20Token = ERC20(securitySource.whitelistedERC20Tokens(i));
-            AggregatorV3Interface priceFeed = AggregatorV3Interface(securitySource.priceFeedsWhitelistedERC20Tokens(i));
-            AggregatorV3Interface volFeed = AggregatorV3Interface(securitySource.volatilityFeedsWhitelistedERC20Tokens(i));
-
-            uint256 balance = erc20Token.balanceOf(address(this));
-
-            int256 price;
-            int256 vol;
-
-            (, price, , , ) = priceFeed.latestRoundData();
-            (, vol, , , ) = volFeed.latestRoundData();
-
-            valueHubChainAccountUSD += balance * uint256(price) / 10 ** erc20Token.decimals();
-            valueHubChainAccountVolatility += balance * uint256(vol) / 10 ** erc20Token.decimals();
-        }
-
-        return (valueHubChainAccountUSD, valueHubChainAccountVolatility);
-    }
-
-
-    function evaluateTotalValue() public returns(uint256, uint256) {
-        // Evaluate from hub chain and all spoke chains
-
-        //TODO - Implement spoke chains evaluation
-
-        (uint256 hubChainValue, uint256 hubChainVol) = evaluateHubChainTokens();
-        //console.log("HubChainValue: ", hubChainValue);
-        //console.log("HubChainVol: ", hubChainVol);
-
-        totalValueInUSD = hubChainValue;
-        totalValueInVolatility = hubChainVol;
-
-        return (totalValueInUSD, totalValueInVolatility);
-    }
-
-    function getTotalVaultVolatility() public view returns(uint256) {
-        return totalValueInVolatility/totalValueInUSD;
-    }
-
-    function getTotalValueInUSD() external view returns(uint256) {
-        return totalValueInUSD;
-    }
-
-    function getTotalValueInVolatility() external view returns(uint256) {
-        return totalValueInVolatility;
-    }
-
-    function getMaxVolatility() external view returns(uint256) {
-        return maxVolatility;
-    }
-
     
     function getQuotaPrice() public view returns (uint256) {
-        if(totalSupply() == 0) {
-            return 1;
-        }
-        return totalValueInUSD * 10 ** decimals() / totalSupply();
+        return 1;
     }
 
     function deposit(uint256 _amountInCurrencyToken) public {
@@ -214,14 +149,6 @@ contract VaultHubChainAccount is  Ownable, OApp, OAppOptionsType3, ERC20 {
                 revert(add(result, 32), mload(result))
             }
         }
-    }
-
-    function isValidSigner(address signer, bytes calldata) external view returns (bytes4) {
-        if (_isValidSigner(signer)) {
-            return IERC6551Account.isValidSigner.selector;
-        }
-
-        return bytes4(0);
     }
 
     function isValidSignature(bytes32 hash, bytes memory signature)

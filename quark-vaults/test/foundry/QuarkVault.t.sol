@@ -4,7 +4,6 @@ pragma solidity ^0.8.13;
 import {Test, console} from "forge-std/Test.sol";
 import { QuarkHubChainAccount } from "../../contracts/QuarkHubChainAccount.sol";
 import { QuarkFactory } from "../../contracts/QuarkFactory.sol";
-import { SecuritySource } from "../../contracts/SecuritySource.sol";
 import { MockERC20 } from "../../contracts/mocks/MockERC20.sol";
 import { MockChainlinkDataFeed } from "../../contracts/mocks/MockChainlinkDataFeed.sol";
 
@@ -22,8 +21,6 @@ contract VaultTest is TestHelperOz5 {
     QuarkFactory public factory;
     MockERC20 public currency;
     RegistryHubChain public registry;
-
-    SecuritySource public securitySource;
 
     uint32 private aEid = 1;
     uint32 private bEid = 2;
@@ -48,7 +45,6 @@ contract VaultTest is TestHelperOz5 {
 
 
         currency = new MockERC20("USDC", "USDC");
-        securitySource = new SecuritySource(address(this));
 
         registry = new RegistryHubChain(address(this));
 
@@ -59,148 +55,119 @@ contract VaultTest is TestHelperOz5 {
         
     }
 
-    // function test_createVault() public {
-    //     uint256 vaultId = factory.createVault();
-    //     //address account = factory.quarkHubChainAccounts(vaultId);
+    function test_createVault() public {
+        uint256 vaultId = factory.createVault();
+        //address account = factory.quarkHubChainAccounts(vaultId);
 
-    //     address owner = factory.ownerOf(vaultId);
+        address owner = factory.ownerOf(vaultId);
 
-    //     assertEq(owner, address(this));
-    // }
+        assertEq(owner, address(this));
+    }
 
-    // function test_sendEth() public {
-    //     uint256 vaultId = factory.createVault();
-    //     address payable account = payable(factory.quarkHubChainAccounts(vaultId));
+    function test_sendEth() public {
+        uint256 vaultId = factory.createVault();
+        address payable account = payable(factory.quarkHubChainAccounts(vaultId));
 
-    //     uint256 balanceBefore = account.balance;
-    //     (bool success, ) = account.call{value: 0.0001 ether}("");
+        uint256 balanceBefore = account.balance;
+        (bool success, ) = account.call{value: 0.0001 ether}("");
 
-    //     assertEq(success, true);
-    //     uint256 balanceAfter = account.balance;
-    //     assertEq(balanceAfter, balanceBefore + 0.0001 ether);
+        assertEq(success, true);
+        uint256 balanceAfter = account.balance;
+        assertEq(balanceAfter, balanceBefore + 0.0001 ether);
 
-    //     (success, ) = account.call{ value: 1 ether} (
-    //         abi.encodeWithSignature("execute(address,uint256,bytes,uint256)", vm.addr(1), 0.0000011 ether, "", 0)
-    //     );
+        (success, ) = account.call{ value: 1 ether} (
+            abi.encodeWithSignature("execute(address,uint256,bytes,uint256)", vm.addr(1), 0.0000011 ether, "", 0)
+        );
 
-    //     assertEq(success, true);
+        assertEq(success, true);
 
-    // }
+    }
 
-    // function test_whitelistTokens() public {
+    function test_whitelistTokens() public {
 
-    //     MockERC20 token1 = new MockERC20("WBTC", "WBTC");
-    //     MockERC20 token2 = new MockERC20("USDC", "USDC");
+        MockERC20 token1 = new MockERC20("WBTC", "WBTC");
+        MockERC20 token2 = new MockERC20("USDC", "USDC");
 
-    //     //price feed mocked contracts
-    //     MockChainlinkDataFeed priceFeed1 = new MockChainlinkDataFeed(6306055000000); // BTC / USD prices 8 decimals
-    //     MockChainlinkDataFeed priceFeed2 = new MockChainlinkDataFeed(100000000); // USDC / USD prices 8 decimals
+        //price feed mocked contracts
+        MockChainlinkDataFeed priceFeed1 = new MockChainlinkDataFeed(6306055000000); // BTC / USD prices 8 decimals
+        MockChainlinkDataFeed priceFeed2 = new MockChainlinkDataFeed(100000000); // USDC / USD prices 8 decimals
 
-    //     //volatility feed mocked contracts
-    //     MockChainlinkDataFeed volatilityFeed1 = new MockChainlinkDataFeed(67415); // BTC / USD  30 days volatitly 3 decimals on percentage -> 67415 = 67.415% vol
-    //     MockChainlinkDataFeed volatilityFeed2 = new MockChainlinkDataFeed(0); // USDC / USD  30 days volatitly 3 decimals on percentage
+        //volatility feed mocked contracts
+        MockChainlinkDataFeed volatilityFeed1 = new MockChainlinkDataFeed(67415); // BTC / USD  30 days volatitly 3 decimals on percentage -> 67415 = 67.415% vol
+        MockChainlinkDataFeed volatilityFeed2 = new MockChainlinkDataFeed(0); // USDC / USD  30 days volatitly 3 decimals on percentage
 
-    //     address[] memory tokens = new address[](2);
-    //     tokens[0] = address(token1);
-    //     tokens[1] = address(token2);
+        address[] memory tokens = new address[](2);
+        tokens[0] = address(token1);
+        tokens[1] = address(token2);
 
-    //     address[] memory priceFeeds = new address[](2);
-    //     priceFeeds[0] = address(priceFeed1);
-    //     priceFeeds[1] = address(priceFeed2);
+        address[] memory priceFeeds = new address[](2);
+        priceFeeds[0] = address(priceFeed1);
+        priceFeeds[1] = address(priceFeed2);
 
-    //     address[] memory volatilityFeeds = new address[](2);
-    //     volatilityFeeds[0] = address(volatilityFeed1);
-    //     volatilityFeeds[1] = address(volatilityFeed2);
+        address[] memory volatilityFeeds = new address[](2);
+        volatilityFeeds[0] = address(volatilityFeed1);
+        volatilityFeeds[1] = address(volatilityFeed2);
 
+    }
 
-    //     securitySource.setWhitelistedERC20Tokens(tokens, priceFeeds, volatilityFeeds);
+    function test_initialDeposit() public {
 
-    //     assertEq(securitySource.numberWhitelistedERC20Tokens(), 2);
+        uint256 vaultId = factory.createVault();
+        address account = factory.quarkHubChainAccounts(vaultId);
 
-    //     assertEq(securitySource.whitelistedERC20Tokens(0), address(token1));
-    //     assertEq(securitySource.whitelistedERC20Tokens(1), address(token2));
+        currency.mint(address(this), 1000 ether);
+        currency.approve(payable(account), 1000 ether);
 
-    //     assertEq(securitySource.priceFeedsWhitelistedERC20Tokens(0), address(priceFeed1));
-    //     assertEq(securitySource.priceFeedsWhitelistedERC20Tokens(1), address(priceFeed2));
+        QuarkHubChainAccount(payable(account)).deposit(1000 ether);
 
-    //     assertEq(securitySource.volatilityFeedsWhitelistedERC20Tokens(0), address(volatilityFeed1));
-    //     assertEq(securitySource.volatilityFeedsWhitelistedERC20Tokens(1), address(volatilityFeed2));
-    // }
+        uint256 price = 1;
 
-    // function test_initialDeposit() public {
-
-    //     uint256 vaultId = factory.createVault();
-    //     address account = factory.quarkHubChainAccounts(vaultId);
-
-    //     currency.mint(address(this), 1000 ether);
-    //     currency.approve(payable(account), 1000 ether);
-
-    //     QuarkHubChainAccount(payable(account)).deposit(1000 ether);
-
-    //     uint256 price = 1;
-
-    //     assertEq(currency.balanceOf(account), 1000 ether);
-    //     assertEq(QuarkHubChainAccount(payable(account)).balanceOf(address(this)), 1000 ether / price);
-    // }
+        assertEq(currency.balanceOf(account), 1000 ether);
+        assertEq(QuarkHubChainAccount(payable(account)).balanceOf(address(this)), 1000 ether / price);
+    }
 
 
-    // function test_depositAfterWBTCDeposit() public {
+    function test_depositAfterWBTCDeposit() public {
 
-    //     MockERC20 token1 = new MockERC20("WBTC", "WBTC");
+        MockERC20 token1 = new MockERC20("WBTC", "WBTC");
 
-    //     //price feed mocked contracts
-    //     MockChainlinkDataFeed priceFeed1 = new MockChainlinkDataFeed(6306055000000); // BTC / USD prices 8 decimals
-    //     MockChainlinkDataFeed priceFeed2 = new MockChainlinkDataFeed(100000000); // USDC / USD prices 8 decimals
+        //price feed mocked contracts
+        MockChainlinkDataFeed priceFeed1 = new MockChainlinkDataFeed(6306055000000); // BTC / USD prices 8 decimals
+        MockChainlinkDataFeed priceFeed2 = new MockChainlinkDataFeed(100000000); // USDC / USD prices 8 decimals
 
-    //     //volatility feed mocked contracts
-    //     MockChainlinkDataFeed volatilityFeed1 = new MockChainlinkDataFeed(67415); // BTC / USD  30 days volatitly 3 decimals on percentage -> 67415 = 67.415% vol
-    //     MockChainlinkDataFeed volatilityFeed2 = new MockChainlinkDataFeed(0); // USDC / USD  30 days volatitly 3 decimals on percentage
+        //volatility feed mocked contracts
+        MockChainlinkDataFeed volatilityFeed1 = new MockChainlinkDataFeed(67415); // BTC / USD  30 days volatitly 3 decimals on percentage -> 67415 = 67.415% vol
+        MockChainlinkDataFeed volatilityFeed2 = new MockChainlinkDataFeed(0); // USDC / USD  30 days volatitly 3 decimals on percentage
 
-    //     address[] memory tokens = new address[](2);
-    //     tokens[0] = address(token1);
-    //     tokens[1] = address(currency);
+        address[] memory tokens = new address[](2);
+        tokens[0] = address(token1);
+        tokens[1] = address(currency);
 
-    //     address[] memory priceFeeds = new address[](2);
-    //     priceFeeds[0] = address(priceFeed1);
-    //     priceFeeds[1] = address(priceFeed2);
+        address[] memory priceFeeds = new address[](2);
+        priceFeeds[0] = address(priceFeed1);
+        priceFeeds[1] = address(priceFeed2);
 
-    //     address[] memory volatilityFeeds = new address[](2);
-    //     volatilityFeeds[0] = address(volatilityFeed1);
-    //     volatilityFeeds[1] = address(volatilityFeed2);
+        address[] memory volatilityFeeds = new address[](2);
+        volatilityFeeds[0] = address(volatilityFeed1);
+        volatilityFeeds[1] = address(volatilityFeed2);
 
-    //     securitySource.setWhitelistedERC20Tokens(tokens, priceFeeds, volatilityFeeds);
+        uint256 vaultId = factory.createVault();
+        address account = factory.quarkHubChainAccounts(vaultId);
 
-    //     factory.setSecuritySourceHubchain(address(securitySource));
+        currency.mint(address(this), 1000 ether);
+        currency.approve(payable(account), 1000 ether);
 
-    //     uint256 vaultId = factory.createVault();
-    //     address account = factory.quarkHubChainAccounts(vaultId);
+        QuarkHubChainAccount(payable(account)).deposit(1000 ether);
 
-    //     currency.mint(address(this), 1000 ether);
-    //     currency.approve(payable(account), 1000 ether);
+        uint256 price = 1;
 
-    //     QuarkHubChainAccount(payable(account)).deposit(1000 ether);
+        assertEq(currency.balanceOf(account), 1000  ether);
+        assertEq(QuarkHubChainAccount(payable(account)).balanceOf(address(this)), 1000 ether / price);
 
-    //     uint256 price = 1;
+        //Send WBTC to the account
 
-    //     assertEq(currency.balanceOf(account), 1000  ether);
-    //     assertEq(QuarkHubChainAccount(payable(account)).balanceOf(address(this)), 1000 ether / price);
-
-    //     //Send WBTC to the account
-
-    //     token1.mint(account, 1 ether);
-
-    //     (uint256 amount, ) = QuarkHubChainAccount(payable(account)).evaluateTotalValue();
-
-    //     uint256 amountExpected;
-
-    //     for(uint256 i = 0; i < tokens.length; i++) {
-    //         uint256 balance = MockERC20(tokens[i]).balanceOf(account);
-    //         (, int256 priceFromFeed, , , ) = MockChainlinkDataFeed(priceFeeds[i]).latestRoundData();
-    //         amountExpected += balance * uint256(priceFromFeed) / 10 ** MockERC20(tokens[i]).decimals();
-    //     }
-
-    //     assertEq(amount, amountExpected);
-    // }
+        token1.mint(account, 1 ether);
+    }
 
     function test_createSpokeChainAccount() public{
 

@@ -18,7 +18,6 @@ contract DeployHubChain is Script {
     MockERC20 public currencyHubChain;
     RegistryHubChain public registry;
 
-    SecuritySource public securitySourceHubChain;
 
 
 
@@ -49,7 +48,6 @@ contract DeployHubChain is Script {
         console.log("currency address: ", address(currencyHubChain));
         console.log("Owner address: ", owner);
         console.log("Endpoint Hub Chain address: ", endpointHubChain);
-        console.log("Security Source address: ", address(securitySourceHubChain));
         console.log("Factory address: ", address(factoryHubChain));
 
         vm.stopBroadcast();
