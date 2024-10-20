@@ -38,9 +38,6 @@ contract DeployHubChain is Script {
 
         
 
-
-
-
         factoryHubChain = new QuarkFactory(owner,  address(registry), address(currencyHubChain), endpointHubChain);
 
         console.log("-------- Hub Chain DEPLOYMENT --------");

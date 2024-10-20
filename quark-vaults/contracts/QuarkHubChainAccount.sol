@@ -21,6 +21,10 @@ import { OAppOptionsType3 } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OA
 import { OptionsBuilder } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OptionsBuilder.sol";
 
 
+import { IManagementPolicy } from "./interfaces/IManagementPolicy.sol";
+import { IDepositPolicy } from "./interfaces/IDepositPolicy.sol";
+
+
 
 import { console } from "forge-std/Test.sol";
 
@@ -42,13 +46,17 @@ contract QuarkHubChainAccount is  Ownable, OApp, OAppOptionsType3, ERC20 {
     uint128 public GAS_LIMIT_SEND_ABA = 3000000;
     uint128 public MSG_VALUE_SEND_ABA = 5000000000000000;
 
-
+    IManagementPolicy public managementPolicy;
+    IDepositPolicy public depositPolicy;
 
     mapping(uint256 => address) public spokeChainsImplementationsAccounts; // ChainId to SpokeChainAccount
 
     mapping(uint32 => address) public spokeChainsAccounts;
 
     mapping(uint32 => uint256) public spokeChainsValueLocked;
+
+
+    string public vaultName;
 
 
 
@@ -77,8 +85,14 @@ contract QuarkHubChainAccount is  Ownable, OApp, OAppOptionsType3, ERC20 {
     }
 
     //CUSTOM FUNCTIONS
-    function initializeAccount(address _factory, address _currency) public onlyNotInitialized {
+    function initializeAccount(address _factory, address _currency, string memory _name, address _managementPolicy, address _depositPolicy) public onlyNotInitialized {
         //require(_isValidSigner(msg.sender), "Invalid signer");
+
+        managementPolicy = IManagementPolicy(_managementPolicy);
+        depositPolicy = IDepositPolicy(_depositPolicy);
+
+        vaultName = _name;
+        
         
         
         currencyToken = ERC20(_currency);
@@ -116,6 +130,9 @@ contract QuarkHubChainAccount is  Ownable, OApp, OAppOptionsType3, ERC20 {
 
     function deposit(uint256 _amountInCurrencyToken) public {
         require(_isValidSigner(msg.sender), "Invalid signer");
+        if(address(depositPolicy) != address(0) && !depositPolicy.validDepositor(msg.sender)){
+            revert("Depositor not allowed by policy");
+        }
 
         uint256 amountInQuota = _amountInCurrencyToken / getQuotaPrice();
 
@@ -156,8 +173,15 @@ contract QuarkHubChainAccount is  Ownable, OApp, OAppOptionsType3, ERC20 {
         address _to,
         bytes calldata data
     ) public payable  {
-
         require(_isValidSigner(msg.sender), "Invalid signer");
+
+        
+
+        if(address(managementPolicy) != address(0)){
+            if(!managementPolicy.isContractAllowed(_dstEid, _to)){
+                revert("Transaction not allowed by policy");
+            }
+        }
 
         bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(GAS_LIMIT_SEND_ABA, MSG_VALUE_SEND_ABA);
 

@@ -61,7 +61,7 @@ contract VaultTest is TestHelperOz5 {
     }
 
     function test_createVault() public {
-        uint256 vaultId = factory.createVault();
+        uint256 vaultId = factory.createVault("TEST", address(0), address(0));
         //address account = factory.quarkHubChainAccounts(vaultId);
 
         address owner = factory.ownerOf(vaultId);
@@ -70,7 +70,7 @@ contract VaultTest is TestHelperOz5 {
     }
 
     function test_sendEth() public {
-        uint256 vaultId = factory.createVault();
+        uint256 vaultId = factory.createVault("TEST", address(0), address(0));
         address payable account = payable(factory.quarkHubChainAccounts(vaultId));
 
         uint256 balanceBefore = account.balance;
@@ -90,7 +90,7 @@ contract VaultTest is TestHelperOz5 {
 
     function test_initialDeposit() public {
 
-        uint256 vaultId = factory.createVault();
+        uint256 vaultId = factory.createVault("TEST", address(0), address(0));
         address account = factory.quarkHubChainAccounts(vaultId);
 
         currency.mint(address(this), 1000 ether);
@@ -106,7 +106,7 @@ contract VaultTest is TestHelperOz5 {
 
     function test_executeMint() public {
 
-        uint256 vaultId = factory.createVault();
+        uint256 vaultId = factory.createVault("TEST", address(0), address(0));
         QuarkHubChainAccount vault = QuarkHubChainAccount(payable(factory.quarkHubChainAccounts(vaultId)));
 
         vault.execute(address(currency), 0, abi.encodeWithSignature("mint(address,uint256)", vm.addr(1), 10 ether), 0);

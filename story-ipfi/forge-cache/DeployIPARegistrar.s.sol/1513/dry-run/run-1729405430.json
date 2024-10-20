@@ -1,0 +1,10 @@
+{
+  "transactions": [
+    {
+      "rpc": "https://testnet.storyrpc.io"
+    },
+    {
+      "rpc": "https://testnet.storyrpc.io"
+    }
+  ]
+}

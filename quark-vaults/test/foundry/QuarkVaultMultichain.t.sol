@@ -81,7 +81,7 @@ contract VaultTest is TestHelperOz5 {
 
 
     function test_create_spoke_chain() public {
-        uint256 vaultId = factory.createVault();
+        uint256 vaultId = factory.createVault("TEST", address(0), address(0));
 
         QuarkHubChainAccount vault = QuarkHubChainAccount(payable(factory.quarkHubChainAccounts(vaultId)));
 
@@ -100,7 +100,7 @@ contract VaultTest is TestHelperOz5 {
     }
 
     function test_execute_on_spoke_chain() public {
-        uint256 vaultId = factory.createVault();
+        uint256 vaultId = factory.createVault("TEST", address(0), address(0));
 
         QuarkHubChainAccount vault = QuarkHubChainAccount(payable(factory.quarkHubChainAccounts(vaultId)));
 

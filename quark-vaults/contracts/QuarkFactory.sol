@@ -63,7 +63,7 @@ contract QuarkFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
         registry = IRegistryHubChain(_registry);
     }
 
-    function createVault() public returns (uint256){
+    function createVault(string memory _name, address _managementPolicy, address _depositPolicy) public returns (uint256){
         uint256 vaultId = vaultCounter;
 
         vaultCounter++;
@@ -72,7 +72,7 @@ contract QuarkFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
 
         address vaultAccount = registry.createHubChainAccount(_msgSender(), lzEndpoint);
 
-        QuarkHubChainAccount(payable(vaultAccount)).initializeAccount(address(this), address(currencyToken));
+        QuarkHubChainAccount(payable(vaultAccount)).initializeAccount(address(this), address(currencyToken), _name, _managementPolicy, _depositPolicy);
 
         _transfer(address(this), msg.sender, vaultId);
 

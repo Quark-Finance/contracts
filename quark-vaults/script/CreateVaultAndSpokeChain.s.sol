@@ -36,7 +36,7 @@ contract  CreateVaultAndSetSpokeChain is Script {
 
         factoryHubChain = QuarkFactory(factoryHubChainAddress);
 
-        uint256 vaultId = factoryHubChain.createVault();
+        uint256 vaultId = factoryHubChain.createVault("TEST", address(0), address(0));
 
         //uint256 vaultId = 0;
 
