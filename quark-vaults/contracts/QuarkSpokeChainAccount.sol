@@ -20,7 +20,7 @@ import { MessagingReceipt } from "@layerzerolabs/oapp-evm/contracts/oapp/OAppSen
 import { OAppOptionsType3 } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OAppOptionsType3.sol";
 import { OptionsBuilder } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OptionsBuilder.sol";
 
-//import { console } from "forge-std/Test.sol";
+import { console } from "forge-std/Test.sol";
 
 contract QuarkSpokeChainAccount is Ownable, OApp, OAppOptionsType3 {
     receive() external payable {}
@@ -76,7 +76,33 @@ contract QuarkSpokeChainAccount is Ownable, OApp, OAppOptionsType3 {
         address /*_executor*/,
         bytes calldata /*_extraData*/
     ) internal override {
-        // Get message from Vault HubChain
+        
+        (address to, uint256 dataStart, uint256 dataLength) = decodeMessage(payload);
+
+        console.log("dataStart: ", dataStart);
+        console.log("dataLength: ", dataLength);
+
+
+
+        
+
+        (bool success, bytes memory result) = to.call(payload[dataStart:dataStart+dataLength]);
+
+        if(!success){
+            revert("Unable to perform transaction");
+        }
+
+    }
+
+    function decodeMessage(bytes calldata encodedMessage) public returns (address to, uint256 dataStart, uint256 dataLength) {
+
+        (to, dataLength, dataStart) = abi.decode(encodedMessage, (address, uint256, uint256));
+
+        dataStart +=32;
+
+        console.log("to: ", to);
+
+        return(to, dataStart, dataLength);
     }
 
 

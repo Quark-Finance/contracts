@@ -98,4 +98,23 @@ contract VaultTest is TestHelperOz5 {
         verifyPackets(aEid, address(factory.quarkHubChainAccounts(vaultId)));
 
     }
+
+    function test_execute_on_spoke_chain() public {
+        uint256 vaultId = factory.createVault();
+
+        QuarkHubChainAccount vault = QuarkHubChainAccount(payable(factory.quarkHubChainAccounts(vaultId)));
+
+        vault.requestNewSpokeChain{ value: 13000000005010484 }(vaultId, spokeChainId1);
+
+        verifyPackets(bEid, addressToBytes32(address(registrySpoke1)));
+
+        verifyPackets(aEid, addressToBytes32(address(factory)));
+
+        vault.executeOnSpokeChain{ value: 7000000000000000 }(bEid, address(currency), abi.encodeWithSignature("mint(address,uint256)", vault.spokeChainsAccounts(bEid), 99 ether));
+
+        verifyPackets(bEid, vault.spokeChainsAccounts(bEid));
+        assertEq(currency.balanceOf(vault.spokeChainsAccounts(bEid)), 99 ether);
+
+
+    }
 }
