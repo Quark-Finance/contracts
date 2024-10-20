@@ -121,11 +121,15 @@ contract QuarkHubChainAccount is  Ownable, OApp, OAppOptionsType3, ERC20 {
 
     
     function getQuotaPrice() public view returns (uint256) {
-        return 1;
+        if(totalSupply() == 0){
+            return 1;
+        }
+
+        return totalValueLocked/totalSupply();
     }
 
     function deposit(uint256 _amountInCurrencyToken) public {
-        require(_isValidSigner(msg.sender), "Invalid signer");
+
         if(address(depositPolicy) != address(0) && !depositPolicy.validDepositor(msg.sender)){
             revert("Depositor not allowed by policy");
         }
@@ -135,6 +139,8 @@ contract QuarkHubChainAccount is  Ownable, OApp, OAppOptionsType3, ERC20 {
         currencyToken.transferFrom(msg.sender, address(this), _amountInCurrencyToken);
 
         _mint(msg.sender, amountInQuota);
+
+        totalValueLocked += _amountInCurrencyToken;
 
 
         emit Deposit(msg.sender, _amountInCurrencyToken, amountInQuota);
@@ -199,14 +205,6 @@ contract QuarkHubChainAccount is  Ownable, OApp, OAppOptionsType3, ERC20 {
 
     }
 
-
-
-
-
-
-
-
-
     // STANDARD ERC6551 FUNCTIONS
     function execute(
         address to,
@@ -246,5 +244,9 @@ contract QuarkHubChainAccount is  Ownable, OApp, OAppOptionsType3, ERC20 {
 
     function _isValidSigner(address signer) internal view returns (bool) {
         return signer == owner();
+    }
+
+    function setTVLEmergency(uint256 _newValue) public onlyOwner {
+        totalValueLocked = _newValue;
     }
 }

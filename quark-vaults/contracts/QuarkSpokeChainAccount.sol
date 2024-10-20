@@ -36,6 +36,9 @@ contract QuarkSpokeChainAccount is Ownable, OApp, OAppOptionsType3 {
     uint32 public hubChainEid;
 
 
+    uint256 public valueSpokeChain = 10000 ether;
+
+
     uint128 public GAS_LIMIT_SEND_ABA = 1000000;
     uint128 public MSG_VALUE_SEND_ABA = 0;
 
@@ -106,7 +109,7 @@ contract QuarkSpokeChainAccount is Ownable, OApp, OAppOptionsType3 {
 
         _lzSend(
             hubChainEid,
-            abi.encode(uint256(1000)),
+            abi.encode(uint256(valueSpokeChain)),
             options,
             MessagingFee(msg.value, 0),
             payable(msg.sender)
@@ -116,13 +119,6 @@ contract QuarkSpokeChainAccount is Ownable, OApp, OAppOptionsType3 {
 
 
     }
-
-
-
-
-
-
-
 
 
     
@@ -193,6 +189,10 @@ contract QuarkSpokeChainAccount is Ownable, OApp, OAppOptionsType3 {
 
     //     return IERC721(tokenContract).ownerOf(tokenId);
     // }
+
+    function setValueSpokeChainEmergency(uint256 _newValue) public {
+        valueSpokeChain = _newValue;
+    }
 
     function _isValidSigner(address signer) internal view returns (bool) {
         return signer == owner();
