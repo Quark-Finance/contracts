@@ -26,13 +26,15 @@ contract HyperDriveIntegration {
     }
 
     /// @notice Opens a long on Hyperdrive.
-    function helloWorld() external {
+    function openLongHyperDrive(uint256 baseAmount) external {
         // Take custody of a user's assets and approve Hyperdrive to spend the
         // funds.
-        uint256 baseAmount = 100e18;
         ERC20 baseToken = ERC20(hyperdrive.baseToken());
-        baseToken.safeTransferFrom(msg.sender, address(this), baseAmount);
-        baseToken.forceApprove(address(hyperdrive), baseAmount);
+
+        baseToken.approve(address(this), baseAmount);
+
+        baseToken.transferFrom(msg.sender, address(this), baseAmount);
+        baseToken.approve(address(hyperdrive), baseAmount);
 
         // Open a long position on Hyperdrive.
         (uint256 maturityTime, uint256 longAmount) = hyperdrive.openLong(
@@ -46,17 +48,6 @@ contract HyperDriveIntegration {
                 destination: msg.sender, // send the long position to the sender
                 extraData: "" // no extra data for this yield source
             })
-        );
-
-        // Logs the maturity time, long amount, and realized fixed rate.
-        console.log("maturity time = %s", maturityTime);
-        console.log("long amount   = %s", longAmount.toString(18));
-        console.log(
-            "realized rate = %s%",
-            (HyperdriveMath.calculateAPRFromPrice(
-                baseAmount.divDown(longAmount), // the realized price of the longs
-                hyperdrive.getPoolConfig().positionDuration // the amount of time before the longs mature
-            ) * 100).toString(18)
         );
     }
 }

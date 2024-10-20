@@ -24,11 +24,11 @@ contract  SetupConfigHubChainFactoryRegistrySepoliaToLineaSepolia is Script {
         //uint256 privateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast();
 
-        address factoryHubChainAddress =  0x5d48ad1c41b32caf687716f871C4e46687605924;
-        uint32 spokeChainEid = 	 40245;
-        address spokeChainRegistryAddresss = 0xae133BED32fB31E182D900AB482B8fC0defDa25D;
+        address factoryHubChainAddress =  0x1647c455e79dbFF1fC6AE3BE08235F7F1f455E12;
+        uint32 spokeChainEid = 	 40161;
+        address spokeChainRegistryAddresss = 0xF4E68f7b7Acd54947F33e475497Bf487489fD14f;
 
-        uint256 spokeChainId = 84532;
+        uint256 spokeChainId = 11155111;
 
 
         factoryHubChain = QuarkFactory(factoryHubChainAddress);

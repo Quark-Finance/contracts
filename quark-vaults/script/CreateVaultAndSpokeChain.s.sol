@@ -32,18 +32,18 @@ contract  CreateVaultAndSetSpokeChain is Script {
         //uint256 privateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast();
 
-        address factoryHubChainAddress =  0x5d48ad1c41b32caf687716f871C4e46687605924;
+        address factoryHubChainAddress =  0x1647c455e79dbFF1fC6AE3BE08235F7F1f455E12;
 
         factoryHubChain = QuarkFactory(factoryHubChainAddress);
 
-        uint256 vaultId = factoryHubChain.createVault("TEST", address(0), address(0));
+        //uint256 vaultId = factoryHubChain.createVault("TEST", address(0), address(0));
 
-        //uint256 vaultId = 0;
+        uint256 vaultId = 0;
 
         QuarkHubChainAccount vault = QuarkHubChainAccount(payable(factoryHubChain.quarkHubChainAccounts(vaultId)));
 
 
-        uint256 spokeChainId = 	84532;
+        uint256 spokeChainId = 	11155111;
 
         //factoryHubChain.createSpokeChainAccount{ value: 100000000000000000 }(vaultId, spokeChainId);
 

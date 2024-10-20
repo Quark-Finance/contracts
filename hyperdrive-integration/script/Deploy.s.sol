@@ -16,10 +16,14 @@ contract CounterScript is Script {
     function run() public {
         vm.startBroadcast();
 
-        hyperdrive = new HyperDriveIntegration(IHyperdrive(0xD5D9556052dB810Da774BeC127cd2aFF548a6571)); // base market
+        hyperdrive = new HyperDriveIntegration(IHyperdrive(0xfA8dB2177F1e1eE4327c9b9d1389b1173bC5A5e2)); // sepolia market
 
-        
+        IERC20(0xe8b99bF4249D90C0eB900651F92485F7160A0513).approve(address(hyperdrive), 10e18);
 
+
+        hyperdrive.openLongHyperDrive(10e18);
+
+        console.log("Hyperdrive: ", address(hyperdrive));
         
 
         vm.stopBroadcast();

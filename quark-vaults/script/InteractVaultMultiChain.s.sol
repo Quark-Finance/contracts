@@ -35,7 +35,7 @@ contract  CreateVaultAndSetSpokeChain is Script {
 
         uint256 vaultId = 0;
 
-        address factoryHubChainAddress =  0x5d48ad1c41b32caf687716f871C4e46687605924;
+        address factoryHubChainAddress =   0x1647c455e79dbFF1fC6AE3BE08235F7F1f455E12;
 
         factoryHubChain = QuarkFactory(factoryHubChainAddress);
 
@@ -44,17 +44,21 @@ contract  CreateVaultAndSetSpokeChain is Script {
         console.log("Vault Address: ", vaultAddress);
 
 
-        QuarkHubChainAccount vault = QuarkHubChainAccount(payable(0x9adC31B49cb51Ab47fA9A87918E5824d8C4E7134));
+        QuarkHubChainAccount vault = QuarkHubChainAccount(payable(vaultAddress));
 
 
-        uint256 spokeChainId = 	84532;
-        uint32 spokeChainEid = 40245;
+        uint256 spokeChainId = 	11155111;
+        uint32 spokeChainEid = 40161;
 
-        address target = 0xbd856Ea0F5Acc0C1aF74B2b829c71940722850EF;
+        address targetDai = 0xe8b99bF4249D90C0eB900651F92485F7160A0513;
 
-        vault.executeOnSpokeChain{value: 90700837514595}(spokeChainEid, target, abi.encodeWithSignature("mint(address,uint256)", address(vault.spokeChainsAccounts(spokeChainEid)), 10 ether));
+        address hyperDrive = 0x8eA2c57C107682C50D77cd4D5517F8Dcf5E2EdE8;
 
-        //vault.requestNewSpokeChain{ value: 13087962049559454 }(vaultId, spokeChainId);
+        //vault.executeOnSpokeChain{value: 195860172447595}(spokeChainEid, targetDai, abi.encodeWithSignature("mint(address,uint256)", address(vault.spokeChainsAccounts(spokeChainEid)), 999 ether));
+
+        //vault.executeOnSpokeChain{value: 195860172447595}(spokeChainEid, targetDai, abi.encodeWithSignature("approve(address,uint256)", address(hyperDrive), 100 ether));
+
+        vault.executeOnSpokeChain{value: 195860172447595}(spokeChainEid, hyperDrive, abi.encodeWithSignature("openLongHyperDrive(uint256)", 10 ether));
         vm.stopBroadcast();
         
     }
