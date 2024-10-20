@@ -22,9 +22,15 @@ contract VaultTest is TestHelperOz5 {
     QuarkFactory public factory;
     MockERC20 public currency;
     RegistryHubChain public registry;
+    RegistrySpokeChain registrySpoke1;
+    RegistrySpokeChain registrySpoke2;
 
     uint32 private aEid = 1;
     uint32 private bEid = 2;
+    uint32 private cEid = 3;
+
+    uint256 public spokeChainId1 = 20;
+    uint256 public spokeChainId2 = 30;
 
 
     address private userA = address(0x1);
@@ -42,7 +48,7 @@ contract VaultTest is TestHelperOz5 {
         vm.deal(userB, 1000 ether);
 
         super.setUp();
-        setUpEndpoints(2, LibraryType.UltraLightNode);
+        setUpEndpoints(3, LibraryType.UltraLightNode);
 
 
         currency = new MockERC20("USDC", "USDC");
@@ -57,50 +63,39 @@ contract VaultTest is TestHelperOz5 {
         factory = QuarkFactory(
             _deployOApp(type(QuarkFactory).creationCode, abi.encode(address(this), address(registry), address(currency), endpoints[aEid]))
         );
+
+        registrySpoke1 = RegistrySpokeChain(
+            _deployOApp(type(RegistrySpokeChain).creationCode, abi.encode(address(this), endpoints[bEid]))
+        );
+        registrySpoke1.setHubChainFactoryPeer(aEid, address(factory));
+        factory.setSpokeChainConfig(spokeChainId1, address(registrySpoke1), bEid);
+
+        
+        registrySpoke2 = RegistrySpokeChain(
+            _deployOApp(type(RegistrySpokeChain).creationCode, abi.encode(address(this), endpoints[cEid]))
+        );
+        registrySpoke2.setHubChainFactoryPeer(aEid, address(factory));
+        factory.setSpokeChainConfig(spokeChainId2, address(registrySpoke2), cEid);
         
     }
 
-    function test_createVault() public {
+
+    function test_create_spoke_chain() public {
         uint256 vaultId = factory.createVault();
-        //address account = factory.quarkHubChainAccounts(vaultId);
 
-        address owner = factory.ownerOf(vaultId);
+        QuarkHubChainAccount vault = QuarkHubChainAccount(payable(factory.quarkHubChainAccounts(vaultId)));
 
-        assertEq(owner, address(this));
-    }
+        vault.requestNewSpokeChain{ value: 13000000005010484 }(vaultId, spokeChainId1);
 
-    function test_sendEth() public {
-        uint256 vaultId = factory.createVault();
-        address payable account = payable(factory.quarkHubChainAccounts(vaultId));
+        verifyPackets(bEid, addressToBytes32(address(registrySpoke1)));
 
-        uint256 balanceBefore = account.balance;
-        (bool success, ) = account.call{value: 0.0001 ether}("");
+        verifyPackets(aEid, addressToBytes32(address(factory)));
 
-        assertEq(success, true);
-        uint256 balanceAfter = account.balance;
-        assertEq(balanceAfter, balanceBefore + 0.0001 ether);
+        address spokeChainAccount = vault.spokeChainsAccounts(bEid);
 
-        (success, ) = account.call{ value: 1 ether} (
-            abi.encodeWithSignature("execute(address,uint256,bytes,uint256)", vm.addr(1), 0.0000011 ether, "", 0)
-        );
+        QuarkSpokeChainAccount(payable(spokeChainAccount)).updateValueToHubChain{ value: 2000000 }();
 
-        assertEq(success, true);
+        verifyPackets(aEid, address(factory.quarkHubChainAccounts(vaultId)));
 
-    }
-
-    function test_initialDeposit() public {
-
-        uint256 vaultId = factory.createVault();
-        address account = factory.quarkHubChainAccounts(vaultId);
-
-        currency.mint(address(this), 1000 ether);
-        currency.approve(payable(account), 1000 ether);
-
-        QuarkHubChainAccount(payable(account)).deposit(1000 ether);
-
-        uint256 price = 1;
-
-        assertEq(currency.balanceOf(account), 1000 ether);
-        assertEq(QuarkHubChainAccount(payable(account)).balanceOf(address(this)), 1000 ether / price);
     }
 }

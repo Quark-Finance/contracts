@@ -46,7 +46,6 @@ contract QuarkFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
 
     //omnichain mappings
     mapping(uint256 => address) public spokeChainsRegistries; // ChainId to RegistrySpokeChain
-    //mapping(uint256 => address) public spokeChainsImplementations; // ChainId to QuarkSpokeChainAccount
 
     mapping(uint256 => uint32) public spokeChainsIds; // ChainId to Eid
 
@@ -113,11 +112,8 @@ contract QuarkFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
 
         uint32 dstEid = spokeChainsIds[chainId];
 
-        //bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(GAS_LIMIT, MSG_VALUE);
-
         bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(GAS_LIMIT_SEND_ABA, MSG_VALUE_SEND_ABA);
 
-        //MessagingFee memory fee = _quote(dstEid, message, options, false);
 
         MessagingReceipt memory receipt = _lzSend(
             dstEid,
@@ -176,10 +172,5 @@ contract QuarkFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
         QuarkHubChainAccount(payable(quarkHubChainAccounts[vaultId])).registerNewSpokeChain(_origin.srcEid, newSpokeChainAccount);
 
     }
-
-    // 0x24af70d91a3ee419f51a2d4f11f114a1e0da3511966904b1c7871ff00eee176f
-    // 0xd7bea8b9dc52dd989ae4404ec4d859b05b77d1035edb2d8c9462b466e04b868a
-
-    
-     
+  
 }

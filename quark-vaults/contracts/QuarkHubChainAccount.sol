@@ -32,6 +32,8 @@ contract QuarkHubChainAccount is  Ownable, OApp, OAppOptionsType3, ERC20 {
     ERC20 public currencyToken;
     bool public isInitialized;
 
+    uint32[] public spokeEids;
+
     uint256 public hubChainvalueLocked;
     uint256 public totalValueLocked;
 
@@ -45,10 +47,6 @@ contract QuarkHubChainAccount is  Ownable, OApp, OAppOptionsType3, ERC20 {
 
 
 
-
-
-
-    
 
 
     //modifiers
