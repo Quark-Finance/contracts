@@ -24,9 +24,9 @@ contract  SetupConfigHubChainFactoryRegistrySepoliaToLineaSepolia is Script {
         //uint256 privateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast();
 
-        address factoryHubChainAddress =  0x1647c455e79dbFF1fC6AE3BE08235F7F1f455E12;
+        address factoryHubChainAddress =  0x9F0a79c5A1Fb5f7E2221Ddda85362f97FF847F66;
         uint32 spokeChainEid = 	 40161;
-        address spokeChainRegistryAddresss = 0xF4E68f7b7Acd54947F33e475497Bf487489fD14f;
+        address spokeChainRegistryAddresss = 0xc8db794088542F878a734c4f23E22b04F498B80F;
 
         uint256 spokeChainId = 11155111;
 

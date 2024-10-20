@@ -32,7 +32,7 @@ contract DeployHubChain is Script {
 
         
         address owner = 0x000ef5F21dC574226A06C76AAE7060642A30eB74;
-        address endpointHubChain = 0x6EDCE65403992e310A62460808c4b910D972f10f;
+        address endpointHubChain = 0xb8815f3f882614048CbE201a67eF9c6F10fe5035;
 
         registry = new RegistryHubChain(owner);
 
