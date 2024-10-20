@@ -27,6 +27,8 @@ import { console } from "forge-std/Test.sol";
 contract QuarkHubChainAccount is  Ownable, OApp, OAppOptionsType3, ERC20 {
     receive() external payable {}
 
+    using OptionsBuilder for bytes;
+
     uint256 public state;
     QuarkFactory public factory;
     ERC20 public currencyToken;
@@ -36,6 +38,9 @@ contract QuarkHubChainAccount is  Ownable, OApp, OAppOptionsType3, ERC20 {
 
     uint256 public hubChainvalueLocked;
     uint256 public totalValueLocked;
+
+    uint128 public GAS_LIMIT_SEND_ABA = 3000000;
+    uint128 public MSG_VALUE_SEND_ABA = 5000000000000000;
 
 
 
@@ -146,12 +151,33 @@ contract QuarkHubChainAccount is  Ownable, OApp, OAppOptionsType3, ERC20 {
         return (amount);
     }
 
+    function executeOnSpokeChain(
+        uint32 _dstEid,
+        address _to,
+        bytes calldata data
+    ) public payable  {
 
+        require(_isValidSigner(msg.sender), "Invalid signer");
 
+        bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(GAS_LIMIT_SEND_ABA, MSG_VALUE_SEND_ABA);
 
+        _lzSend(
+            _dstEid, 
+            encodeMessage(_to, data),
+            options,
+            MessagingFee(msg.value, 0),
+            payable(msg.sender)
+        );
 
+    }
 
+    function encodeMessage(address _to, bytes memory data) public pure returns (bytes memory) {
 
+        uint256 dataLength = data.length;
+
+        return abi.encode(_to, dataLength, data, dataLength);
+
+    }
 
 
 

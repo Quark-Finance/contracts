@@ -103,4 +103,15 @@ contract VaultTest is TestHelperOz5 {
         assertEq(currency.balanceOf(account), 1000 ether);
         assertEq(QuarkHubChainAccount(payable(account)).balanceOf(address(this)), 1000 ether / price);
     }
+
+    function test_executeMint() public {
+
+        uint256 vaultId = factory.createVault();
+        QuarkHubChainAccount vault = QuarkHubChainAccount(payable(factory.quarkHubChainAccounts(vaultId)));
+
+        vault.execute(address(currency), 0, abi.encodeWithSignature("mint(address,uint256)", vm.addr(1), 10 ether), 0);
+
+        assertEq(currency.balanceOf(vm.addr(1)), 10 ether);
+
+    }
 }
