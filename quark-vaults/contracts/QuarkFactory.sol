@@ -156,6 +156,10 @@ contract QuarkFactory is Ownable, OApp, OAppOptionsType3,  ERC721 {
 
     }
 
+    function registerSpokeChainEmergency(uint256 vaultId, uint32 _srcEid, address _spokeChainAddress) public onlyOwner {
+        QuarkHubChainAccount(payable(quarkHubChainAccounts[vaultId])).registerNewSpokeChain(_srcEid, _spokeChainAddress);
+    }
+
 
     function _lzReceive(
         Origin calldata _origin,
