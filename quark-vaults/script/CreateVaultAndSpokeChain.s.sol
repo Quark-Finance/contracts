@@ -32,7 +32,7 @@ contract  CreateVaultAndSetSpokeChain is Script {
         //uint256 privateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast();
 
-        address factoryHubChainAddress =   0x9F0a79c5A1Fb5f7E2221Ddda85362f97FF847F66;
+        address factoryHubChainAddress =  0xbA397eFEF3914aB025F7f5706fADE61f240A9EbC;
 
         factoryHubChain = QuarkFactory(factoryHubChainAddress);
 
