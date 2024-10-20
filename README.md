@@ -11,6 +11,13 @@ Two examples of policies created by us are Hyperdrive Policy and StoryPolicy. Th
 
 This archicteture is fully modular in the sense that anyone is able to create their own policy (following our interfaces) and create a vault that is regulated by them. After that, users are able to deposit funds (stablecoins) in the vault, allowing the manager to invest that money in the best strategies possible (following the policies).
 
+Cross-chain message from Unichain to Sepolia: https://testnet.layerzeroscan.com/tx/0xa35565af614266ae8c433cc2f224963e5705b6ce190efa58f35087a6f4238f1f
+
+Cross-chain message performing Hyperdrive open Long with DAI: https://testnet.layerzeroscan.com/tx/0xe9dc2ff4e5383cfd13b6214b484a21ff094a9f463f041ada484444d28bc7df93
+
+
+
+
 
 Deployed Contracts:
 
