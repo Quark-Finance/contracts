@@ -32,23 +32,29 @@ contract  CreateVaultAndSetSpokeChain is Script {
         //uint256 privateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast();
 
+
+        uint256 vaultId = 0;
+
         address factoryHubChainAddress =  0x5d48ad1c41b32caf687716f871C4e46687605924;
 
         factoryHubChain = QuarkFactory(factoryHubChainAddress);
 
-        uint256 vaultId = factoryHubChain.createVault("TEST", address(0), address(0));
+        address vaultAddress = factoryHubChain.quarkHubChainAccounts(vaultId);
 
-        //uint256 vaultId = 0;
+        console.log("Vault Address: ", vaultAddress);
 
-        QuarkHubChainAccount vault = QuarkHubChainAccount(payable(factoryHubChain.quarkHubChainAccounts(vaultId)));
+
+        QuarkHubChainAccount vault = QuarkHubChainAccount(payable(0x9adC31B49cb51Ab47fA9A87918E5824d8C4E7134));
 
 
         uint256 spokeChainId = 	84532;
+        uint32 spokeChainEid = 40245;
 
-        //factoryHubChain.createSpokeChainAccount{ value: 100000000000000000 }(vaultId, spokeChainId);
+        address target = 0xbd856Ea0F5Acc0C1aF74B2b829c71940722850EF;
 
+        vault.executeOnSpokeChain{value: 90700837514595}(spokeChainEid, target, abi.encodeWithSignature("mint(address,uint256)", address(vault.spokeChainsAccounts(spokeChainEid)), 10 ether));
 
-        vault.requestNewSpokeChain{ value: 13087962049559454 }(vaultId, spokeChainId);
+        //vault.requestNewSpokeChain{ value: 13087962049559454 }(vaultId, spokeChainId);
         vm.stopBroadcast();
         
     }

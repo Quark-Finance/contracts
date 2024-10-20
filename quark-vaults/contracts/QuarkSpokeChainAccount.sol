@@ -79,13 +79,6 @@ contract QuarkSpokeChainAccount is Ownable, OApp, OAppOptionsType3 {
         
         (address to, uint256 dataStart, uint256 dataLength) = decodeMessage(payload);
 
-        console.log("dataStart: ", dataStart);
-        console.log("dataLength: ", dataLength);
-
-
-
-        
-
         (bool success, bytes memory result) = to.call(payload[dataStart:dataStart+dataLength]);
 
         if(!success){

@@ -43,8 +43,8 @@ contract QuarkHubChainAccount is  Ownable, OApp, OAppOptionsType3, ERC20 {
     uint256 public hubChainvalueLocked;
     uint256 public totalValueLocked;
 
-    uint128 public GAS_LIMIT_SEND_ABA = 3000000;
-    uint128 public MSG_VALUE_SEND_ABA = 5000000000000000;
+    uint128 public GAS_LIMIT_SEND_ABA = 2000000;
+    uint128 public MSG_VALUE_SEND_ABA = 0;
 
     IManagementPolicy public managementPolicy;
     IDepositPolicy public depositPolicy;
@@ -57,10 +57,6 @@ contract QuarkHubChainAccount is  Ownable, OApp, OAppOptionsType3, ERC20 {
 
 
     string public vaultName;
-
-
-
-
 
     //modifiers
     modifier onlyFactory() {
